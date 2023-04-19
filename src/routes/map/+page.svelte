@@ -1,10 +1,22 @@
+<script>
+    import LeafletMap from '$lib/leaflet/leaflet.svelte';
+	import { count } from '../../Store.js';
+
+	export let form;
+	let countValue;
+
+	count.subscribe(value => {
+		countValue = value;
+	});
+</script>
+
 <svelte:head>
 	<title>Map</title>
 	<meta name="description" content="A map to analyze and plan" />
 </svelte:head>
 
 <div>
-    Hey
+    Hey and {countValue}
     <form method="POST" action="?/contactus">
 		<label>
 		  Start - Lat
@@ -28,7 +40,4 @@
     <LeafletMap />
 </main>
 
-<script>
-    import LeafletMap from '$lib/leaflet/leaflet.svelte';
-	export let form;
-</script>
+
