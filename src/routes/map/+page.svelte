@@ -1,6 +1,6 @@
 <script>
     import LeafletMap from '$lib/leaflet/leaflet.svelte';
-	import { count } from '../../Store.js';
+	import { count, start_lat, start_lon } from '../../Store.js';
 
 	export let form;
 	let countValue;
@@ -8,6 +8,29 @@
 	count.subscribe(value => {
 		countValue = value;
 	});
+
+
+
+	let _start_lat = 0
+	let _start_lon = 0
+	let _goal_lat = 0
+	let _goal_lon = 0
+	let result = null
+	
+	async function doPost () {
+		const res = await fetch('', {
+			method: 'POST',
+			body: JSON.stringify({
+				_start_lat,
+				_start_lon,
+				_goal_lat,
+				_goal_lon,
+			})
+		})
+		
+		const json = await res.json()
+		result = JSON.stringify(json)
+	}
 </script>
 
 <svelte:head>
@@ -28,6 +51,20 @@
 		</label>
 		<button>Set Start</button>
 	  </form>
+</div>
+<div>
+	<input bind:value={_start_lat} type="number"/>
+	<input bind:value={_start_lon} type="number"/>
+	<input bind:value={_goal_lat} type="number"/>
+	<input bind:value={_goal_lon} type="number"/>
+	<button type="button" on:click={doPost}>POST</button>
+
+	<p>
+		Result:
+	</p>
+	<pre>
+		{result}
+	</pre>
 </div>
 
 {#if form?.success }
