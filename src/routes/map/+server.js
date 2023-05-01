@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 
 export async function POST({ request }) {
-	const { description } = await request.json();
+	const { _start_lat, _start_lon, _goal_lat, _goal_lon } = await request.json();
+	const success = true;
 
-	const id = "Test"
 
-	return json({ id }, { status: 201 });
+	return json({ _start_lat, _start_lon, _goal_lat, _goal_lon, success }, { status: 201 });
 }
