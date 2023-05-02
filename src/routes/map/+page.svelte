@@ -11,26 +11,44 @@
 	let _goal_lon = 0;
 	let result = null;
 	let show_result = false;
+	let start = false;
+	let goal = false;
 
     onMount(async () => {
         if(browser) {
             const leaflet = await import('leaflet');
+			const initial_start_lat = 49.672;
+			const initial_start_lon = -351.005;
 
-            map = leaflet.map(mapElement).setView([51.505, -0.09], 13);
+            map = leaflet.map(mapElement).setView([initial_start_lat, initial_start_lon], 13);
 
             leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            leaflet.marker([51.5, -0.09]).addTo(map)
+            leaflet.marker([initial_start_lat, initial_start_lon]).addTo(map)
                 .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
                 .openPopup();
             
             function onMapClick(event) {
-                var circle = leaflet.marker(event.latlng).addTo(map);
-				_start_lat = event.latlng.lat;
-				_start_lon = event.latlng.lng;
-            }
+				if (start) {
+					var markerOptions = {
+						title: "Start",
+					}
+					var circle = leaflet.marker(event.latlng, markerOptions).addTo(map);
+					_start_lat = event.latlng.lat;
+					_start_lon = event.latlng.lng;
+					start = false;
+				} else if (goal) {
+					var markerOptions = {
+						title: "Start",
+					}
+					var circle = leaflet.marker(event.latlng, markerOptions).addTo(map);
+					_goal_lat = event.latlng.lat;
+					_goal_lon = event.latlng.lng;
+					goal = false;
+				}
+			}
 
             map.on('click', onMapClick);
         }
@@ -42,6 +60,16 @@
             map.remove();
         }
     });
+
+	function setStart() {
+		start = true;
+		goal = false;
+	}
+
+	function SetGoal() {
+		start = false;
+		goal = true;
+	}
 	
 	async function doPost () {
 		const res = await fetch('', {
@@ -99,6 +127,12 @@
 	</pre>
 </div>
 {/if}
+
+<hr>
+<div>
+	<button type="button" on:click={setStart}>Set Start</button>
+	<button type="button" on:click={SetGoal}>Set Goal</button>
+</div>
 
 <main>
 	<div bind:this={mapElement}></div>
