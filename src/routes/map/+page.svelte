@@ -1,14 +1,47 @@
 <script>
-    import LeafletMap from '$lib/leaflet/leaflet.svelte';
+	import { onMount, onDestroy } from 'svelte';
+    import { browser } from '$app/environment';
 
-	export let form;
+    let mapElement
+    let map;
 
-	let _start_lat = 0
-	let _start_lon = 0
-	let _goal_lat = 0
-	let _goal_lon = 0
-	let result = null
-	let show_result = false
+	let _start_lat = 0;
+	let _start_lon = 0;
+	let _goal_lat = 0;
+	let _goal_lon = 0;
+	let result = null;
+	let show_result = false;
+
+    onMount(async () => {
+        if(browser) {
+            const leaflet = await import('leaflet');
+
+            map = leaflet.map(mapElement).setView([51.505, -0.09], 13);
+
+            leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            leaflet.marker([51.5, -0.09]).addTo(map)
+                .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+                .openPopup();
+            
+            function onMapClick(event) {
+                var circle = leaflet.marker(event.latlng).addTo(map);
+				_start_lat = event.latlng.lat;
+				_start_lon = event.latlng.lng;
+            }
+
+            map.on('click', onMapClick);
+        }
+    });
+
+    onDestroy(async () => {
+        if(map) {
+            console.log('Unloading Leaflet map.');
+            map.remove();
+        }
+    });
 	
 	async function doPost () {
 		const res = await fetch('', {
@@ -36,25 +69,23 @@
 </svelte:head>
 
 <div>
-    Enter the Start and Goal location and send it to the server.
-    <form method="POST" action="">
-		<label>
-		  Start - Lat
-		  <input bind:value={_start_lat} name="lat" type="number">
-		</label>
-		<label>
-		  Start - Lon
-		  <input bind:value={_start_lon} name="lon" type="number">
-		</label>
-		<label>
-			Goal - Lat
-			<input bind:value={_goal_lat} type="number"/>
-		</label>
-		<label>
-			<input bind:value={_goal_lon} type="number"/>
-		</label>
-		<button type="button" on:click={doPost}>POST</button>
-	  </form>
+	Enter the Start and Goal location and send it to the server.
+	<label>
+		Start - Lat
+		<input bind:value={_start_lat} name="lat" type="number">
+	</label>
+	<label>
+		Start - Lon
+		<input bind:value={_start_lon} name="lon" type="number">
+	</label>
+	<label>
+		Goal - Lat
+		<input bind:value={_goal_lat} type="number"/>
+	</label>
+	<label>
+		<input bind:value={_goal_lon} type="number"/>
+	</label>
+	<button type="button" on:click={doPost}>POST</button>
 </div>
 
 
@@ -70,7 +101,12 @@
 {/if}
 
 <main>
-    <LeafletMap />
+	<div bind:this={mapElement}></div>
 </main>
 
-
+<style>
+    @import 'leaflet/dist/leaflet.css';
+    main div {
+        height: 800px;
+    }
+</style>
