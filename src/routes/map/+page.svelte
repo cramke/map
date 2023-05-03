@@ -10,6 +10,7 @@
 	let _goal_lat = 0;
 	let _goal_lon = 0;
 	let result = null;
+	let test_result = null;
 	let show_result = false;
 	let start = false;
 	let goal = false;
@@ -70,6 +71,14 @@
 		start = false;
 		goal = true;
 	}
+
+	async function doTest() {
+		console.log("Test");
+		const res = await fetch('localhost:8080/echo', {
+			method: 'POST',
+		})
+		console.log(res);
+	}
 	
 	async function doPost () {
 		const res = await fetch('', {
@@ -116,7 +125,11 @@
 	<button type="button" on:click={doPost}>POST</button>
 </div>
 
-
+<button type="button" on:click={doTest}>Actix-Rust</button>
+<p>
+	test_result
+	{test_result}
+</p>
 {#if show_result }
 <div>
 	<p>
