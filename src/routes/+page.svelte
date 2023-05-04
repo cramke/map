@@ -8,8 +8,8 @@
 	let test_result = null
 	
 	async function doPost () {
-		console.log("Test");
-		const res = await fetch('http://127.0.0.2:8080/echo', {
+		const url = 'http://127.0.0.2:8080/echo'
+		const res = await fetch(url, {
 			mode: 'no-cors',
 			method: 'POST',
 			body: JSON.stringify({
@@ -17,12 +17,15 @@
 				bar
 			})
 		})
-		
-		if (res.ok) {
-			test_result = "Yes";
-		} else {
-			test_result = "Noo";
-		}
+
+		console.log(res);
+		const json = await res.json();
+
+		console.log(res.status);
+		console.log(res.headers);
+		console.log(res.ok);
+		console.log(res.body);
+		console.log(json);
 	}
 </script>
 
