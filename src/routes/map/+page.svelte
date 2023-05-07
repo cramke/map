@@ -5,10 +5,10 @@
     let mapElement
     let map;
 
-	let _start_lat = 0;
-	let _start_lon = 0;
-	let _goal_lat = 0;
-	let _goal_lon = 0;
+	let start_lat = 0;
+	let start_lon = 0;
+	let goal_lat = 0;
+	let goal_lon = 0;
 	let result = null;
 	let test_result = null;
 	let show_result = false;
@@ -37,16 +37,16 @@
 						title: "Start",
 					}
 					var circle = leaflet.marker(event.latlng, markerOptions).addTo(map);
-					_start_lat = event.latlng.lat;
-					_start_lon = event.latlng.lng;
+					start_lat = event.latlng.lat;
+					start_lon = event.latlng.lng;
 					start = false;
 				} else if (goal) {
 					var markerOptions = {
 						title: "Start",
 					}
 					var circle = leaflet.marker(event.latlng, markerOptions).addTo(map);
-					_goal_lat = event.latlng.lat;
-					_goal_lon = event.latlng.lng;
+					goal_lat = event.latlng.lat;
+					goal_lon = event.latlng.lng;
 					goal = false;
 				}
 			}
@@ -71,23 +71,17 @@
 		start = false;
 		goal = true;
 	}
-
-	async function doTest() {
-		console.log("Test");
-		const res = await fetch('localhost:8080/echo', {
-			method: 'POST',
-		})
-		console.log(res);
-	}
 	
-	async function doPost () {
-		const res = await fetch('', {
+	async function doDefine () {
+		const url = 'http://127.0.0.2:8080/map'
+		const res = await fetch(url, {
+			mode: 'no-cors',
 			method: 'POST',
 			body: JSON.stringify({
-				_start_lat,
-				_start_lon,
-				_goal_lat,
-				_goal_lon,
+				start_lat,
+				start_lon,
+				goal_lat,
+				goal_lon,
 			})
 		})
 		
@@ -97,6 +91,14 @@
 		} else {
 		}
 		result = JSON.stringify(json);
+	}
+
+	async function doPlan() {
+		const url = 'http://127.0.0.2:8080/plan'
+		const res = await fetch(url, {
+			mode: 'no-cors',
+			method: 'POST'
+		})
 	}
 </script>
 
@@ -109,29 +111,34 @@
 	Enter the Start and Goal location and send it to the server.
 	<label>
 		Start - Lat
-		<input bind:value={_start_lat} name="lat" type="number">
+		<input bind:value={start_lat} name="lat" type="number">
 	</label>
 	<label>
 		Start - Lon
-		<input bind:value={_start_lon} name="lon" type="number">
+		<input bind:value={start_lon} name="lon" type="number">
 	</label>
 	<label>
 		Goal - Lat
-		<input bind:value={_goal_lat} type="number"/>
+		<input bind:value={goal_lat} type="number"/>
 	</label>
 	<label>
-		<input bind:value={_goal_lon} type="number"/>
+		<input bind:value={goal_lon} type="number"/>
 	</label>
-	<button type="button" on:click={doPost}>POST</button>
+	<button type="button" on:click={doDefine}>POST</button>
 </div>
 
-<button type="button" on:click={doTest}>Actix-Rust</button>
+<div>
+	<button type="button" on:click={doPlan}>Start Planning</button>
+</div>
+
+<hr>
+
+{#if show_result }
+<div>
 <p>
 	test_result
 	{test_result}
 </p>
-{#if show_result }
-<div>
 	<p>
 		Result:
 	</p>
@@ -142,6 +149,7 @@
 {/if}
 
 <hr>
+
 <div>
 	<button type="button" on:click={setStart}>Set Start</button>
 	<button type="button" on:click={SetGoal}>Set Goal</button>
