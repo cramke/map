@@ -1,6 +1,7 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
     import { browser } from '$app/environment';
+	import { _doPlan } from './+page';
 
     let mapElement
     let map;
@@ -10,7 +11,6 @@
 	let goal_lat = 0;
 	let goal_lon = 0;
 	let result = null;
-	let test_result = null;
 	let show_result = false;
 	let start = false;
 	let goal = false;
@@ -93,13 +93,6 @@
 		result = JSON.stringify(json);
 	}
 
-	async function doPlan() {
-		const url = 'http://127.0.0.2:8080/plan'
-		const res = await fetch(url, {
-			mode: 'no-cors',
-			method: 'POST'
-		})
-	}
 </script>
 
 <svelte:head>
@@ -128,17 +121,13 @@
 </div>
 
 <div>
-	<button type="button" on:click={doPlan}>Start Planning</button>
+	<button type="button" on:click={_doPlan}>Start Planning</button>
 </div>
 
 <hr>
 
 {#if show_result }
 <div>
-<p>
-	test_result
-	{test_result}
-</p>
 	<p>
 		Result:
 	</p>

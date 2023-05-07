@@ -5,16 +5,23 @@
 	
 	let foo = 'baz'
 	let bar = 'qux'
+	let start_lon = 50.00
+	let start_lat = 50.00
+	let goal_lon = 50.00
+	let goal_lat = 50.00
+
 	let test_result = null
 	
 	async function doPost () {
-		const url = 'http://127.0.0.2:8080/echo'
+		const url = 'http://127.0.0.2:8080/map'
 		const res = await fetch(url, {
 			mode: 'no-cors',
 			method: 'POST',
 			body: JSON.stringify({
-				foo,
-				bar
+				start_lon,
+				start_lat,
+				goal_lat, 
+				// goal_lon,
 			})
 		})
 
