@@ -6,13 +6,13 @@
     let mapElement
     let map;
 
-	let start_lat = 0;
-	let start_lon = 0;
-	let goal_lat = 0;
-	let goal_lon = 0;
+	$: start_lat = 0;
+	$: start_lon = 0;
+	$: goal_lat = 0;
+	$: goal_lon = 0;
 	let result = null;
 	let show_result = false;
-	let start = false;
+	let start = true;
 	let goal = false;
 
     onMount(async () => {
@@ -27,31 +27,59 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            leaflet.marker([initial_start_lat, initial_start_lon]).addTo(map)
-                .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
-                .openPopup();
+			var startMarkerOptions = {
+						title: "Start",
+						draggable: "true"
+					}
+			var goalMarkerOptions = {
+						title: "Goal",
+						draggable: "true"
+					}
+			var start_marker = leaflet.marker([initial_start_lat, initial_start_lon], startMarkerOptions).addTo(map);
+			var goal_marker = leaflet.marker([initial_start_lat, initial_start_lon], goalMarkerOptions).addTo(map);
             
             function onMapClick(event) {
 				if (start) {
-					var markerOptions = {
-						title: "Start",
-					}
-					var circle = leaflet.marker(event.latlng, markerOptions).addTo(map);
-					start_lat = event.latlng.lat;
-					start_lon = event.latlng.lng;
-					start = false;
+					updateStart(event);
 				} else if (goal) {
-					var markerOptions = {
-						title: "Start",
-					}
-					var circle = leaflet.marker(event.latlng, markerOptions).addTo(map);
-					goal_lat = event.latlng.lat;
-					goal_lon = event.latlng.lng;
-					goal = false;
+					updateGoal(event);
 				}
 			}
 
+			function updateStart(event) {
+				start_lat = event.latlng.lat;
+				start_lon = event.latlng.lng;
+				start = false;
+				start_marker.setLatLng(event.latlng);
+				goal = true;
+			}
+
+			function updateGoal(event) {
+				goal_lat = event.latlng.lat;
+				goal_lon = event.latlng.lng;
+				goal = false;
+				goal_marker.setLatLng(event.latlng);
+			}
+
             map.on('click', onMapClick);
+
+			start_marker.on('dragend', function(event) {
+				var position = start_marker.getLatLng();
+				start_lat = position.lat;
+				start_lon = position.lng;
+				start_marker.setLatLng(position, {
+					draggable: 'true'
+				})
+			});
+
+			goal_marker.on('dragend', function(event) {
+				var position = goal_marker.getLatLng();
+				goal_lat = position.lat;
+				goal_lon = position.lng;
+				goal_marker.setLatLng(position, {
+					draggable: 'true'
+				})
+			});
         }
     });
 
